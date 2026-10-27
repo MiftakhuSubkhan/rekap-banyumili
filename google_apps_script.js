@@ -27,12 +27,13 @@ const SHEET_NAME = 'RekapanPenjualan';
 const HEADERS = [
   'ID Transaksi',
   'Tanggal Pesanan',
+  'Platform',
   'Nama Produk',
   'Variasi',
   'Qty',
   'Harga Modal (Rp)',
   'Harga Jual (Rp)',
-  'Biaya Admin Shopee (Rp)',
+  'Biaya Admin (Rp)',
   'Total Penjualan (Rp)',
   'Total Modal (Rp)',
   'Profit Bersih (Rp)',
@@ -74,7 +75,9 @@ function doGet(e) {
       return responseJSON({ success: true, count: 0, data: [] });
     }
 
+    const hasPlatformCol = data[0] && String(data[0][2]).toLowerCase().includes('platform');
     const rows = [];
+
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       if (!row[0]) continue; // Lewati baris kosong
@@ -84,23 +87,46 @@ function doGet(e) {
         tgl = Utilities.formatDate(tgl, Session.getScriptTimeZone(), 'yyyy-MM-dd');
       }
 
-      rows.push({
-        id: String(row[0]),
-        tanggal_pesanan: String(tgl),
-        nama_produk: String(row[2]),
-        variasi: String(row[3] || 'Standar'),
-        qty: Number(row[4]) || 1,
-        harga_modal: Number(row[5]) || 0,
-        harga_jual: Number(row[6]) || 0,
-        biaya_admin: Number(row[7]) || 0,
-        total_penjualan: Number(row[8]) || (Number(row[4]) * Number(row[6])),
-        total_modal: Number(row[9]) || (Number(row[4]) * Number(row[5])),
-        profit_bersih: Number(row[10]) || 0,
-        status_pesanan: String(row[11] || 'Selesai'),
-        catatan: String(row[12] || ''),
-        gambar: String(row[13] || '/products/over_fender.jpg'),
-        created_at: String(row[14] || '')
-      });
+      if (hasPlatformCol) {
+        rows.push({
+          id: String(row[0]),
+          tanggal_pesanan: String(tgl),
+          platform: String(row[2] || 'Shopee'),
+          nama_produk: String(row[3]),
+          variasi: String(row[4] || 'Standar'),
+          qty: Number(row[5]) || 1,
+          harga_modal: Number(row[6]) || 0,
+          harga_jual: Number(row[7]) || 0,
+          biaya_admin: Number(row[8]) || 0,
+          total_penjualan: Number(row[9]) || (Number(row[5]) * Number(row[7])),
+          total_modal: Number(row[10]) || (Number(row[5]) * Number(row[6])),
+          profit_bersih: Number(row[11]) || 0,
+          status_pesanan: String(row[12] || 'Selesai'),
+          catatan: String(row[13] || ''),
+          gambar: String(row[14] || '/products/over_fender.jpg'),
+          created_at: String(row[15] || '')
+        });
+      } else {
+        // Fallback backward compatibility format 15 kolom
+        rows.push({
+          id: String(row[0]),
+          tanggal_pesanan: String(tgl),
+          platform: 'Shopee',
+          nama_produk: String(row[2]),
+          variasi: String(row[3] || 'Standar'),
+          qty: Number(row[4]) || 1,
+          harga_modal: Number(row[5]) || 0,
+          harga_jual: Number(row[6]) || 0,
+          biaya_admin: Number(row[7]) || 0,
+          total_penjualan: Number(row[8]) || (Number(row[4]) * Number(row[6])),
+          total_modal: Number(row[9]) || (Number(row[4]) * Number(row[5])),
+          profit_bersih: Number(row[10]) || 0,
+          status_pesanan: String(row[11] || 'Selesai'),
+          catatan: String(row[12] || ''),
+          gambar: String(row[13] || '/products/over_fender.jpg'),
+          created_at: String(row[14] || '')
+        });
+      }
     }
 
     return responseJSON({ success: true, count: rows.length, data: rows });
@@ -139,6 +165,7 @@ function doPost(e) {
       const newRow = [
         item.id || ('TRX-' + Math.floor(1000 + Math.random() * 9000)),
         item.tanggal_pesanan || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd'),
+        item.platform || 'Shopee',
         item.nama_produk || 'Aksesoris Mobil',
         item.variasi || 'Standar',
         qty,
@@ -183,6 +210,7 @@ function doPost(e) {
         return [
           item.id || ('TRX-' + Math.floor(1000 + Math.random() * 9000)),
           item.tanggal_pesanan || '',
+          item.platform || 'Shopee',
           item.nama_produk || '',
           item.variasi || '',
           qty,
@@ -226,15 +254,15 @@ function doPost(e) {
       const data = sheet.getDataRange().getValues();
       for (let i = 1; i < data.length; i++) {
         if (String(data[i][0]) === String(idToUpdate)) {
-          if (item.status_pesanan) sheet.getRange(i + 1, 12).setValue(item.status_pesanan);
-          if (item.catatan !== undefined) sheet.getRange(i + 1, 13).setValue(item.catatan);
-          if (item.qty !== undefined) sheet.getRange(i + 1, 5).setValue(item.qty);
-          if (item.harga_modal !== undefined) sheet.getRange(i + 1, 6).setValue(item.harga_modal);
-          if (item.harga_jual !== undefined) sheet.getRange(i + 1, 7).setValue(item.harga_jual);
-          if (item.biaya_admin !== undefined) sheet.getRange(i + 1, 8).setValue(item.biaya_admin);
-          if (item.total_penjualan !== undefined) sheet.getRange(i + 1, 9).setValue(item.total_penjualan);
-          if (item.total_modal !== undefined) sheet.getRange(i + 1, 10).setValue(item.total_modal);
-          if (item.profit_bersih !== undefined) sheet.getRange(i + 1, 11).setValue(item.profit_bersih);
+          if (item.status_pesanan) sheet.getRange(i + 1, 13).setValue(item.status_pesanan);
+          if (item.catatan !== undefined) sheet.getRange(i + 1, 14).setValue(item.catatan);
+          if (item.qty !== undefined) sheet.getRange(i + 1, 6).setValue(item.qty);
+          if (item.harga_modal !== undefined) sheet.getRange(i + 1, 7).setValue(item.harga_modal);
+          if (item.harga_jual !== undefined) sheet.getRange(i + 1, 8).setValue(item.harga_jual);
+          if (item.biaya_admin !== undefined) sheet.getRange(i + 1, 9).setValue(item.biaya_admin);
+          if (item.total_penjualan !== undefined) sheet.getRange(i + 1, 10).setValue(item.total_penjualan);
+          if (item.total_modal !== undefined) sheet.getRange(i + 1, 11).setValue(item.total_modal);
+          if (item.profit_bersih !== undefined) sheet.getRange(i + 1, 12).setValue(item.profit_bersih);
           return responseJSON({ success: true, message: 'Transaksi ' + idToUpdate + ' berhasil diperbarui di Google Sheets' });
         }
       }
