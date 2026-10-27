@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Banyumili Co - E-Commerce Reseller Sales Tracker</title>
+  <meta name="description" content="Dashboard tracker penjualan dan profit reseller variasi mobil Banyumili Co untuk Shopee.">
+  
+  <!-- Modern Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏎️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Simulator Controls Bar (Desktop View Only) -->
+  <header class="desktop-controls-bar">
+    <div class="controls-brand">
+      <span>🏎️ Banyumili Co. Tracker</span>
+      <span class="badge-tag">Shopee & TikTok Reseller</span>
+    </div>
+    <div class="controls-actions">
+      <!-- Device View Switcher Segmented Control -->
+      <div class="device-switcher-pill" id="deviceSwitcher">
+        <button type="button" class="device-btn active" data-view="phone" title="Tampilan HP / Mobile (420px)">
+          📱 <span>HP</span>
+        </button>
+        <button type="button" class="device-btn" data-view="tablet" title="Tampilan Tablet / iPad (820px)">
+          📲 <span>Tablet</span>
+        </button>
+        <button type="button" class="device-btn" data-view="fullscreen" title="Tampilan Layar Penuh">
+          💻 <span>Penuh</span>
+        </button>
+      </div>
+      <button id="exportCsvBtn" class="control-btn" title="Unduh Laporan Penjualan CSV">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Export CSV</span>
+      </button>
+      <button id="resetDataBtn" class="control-btn" title="Kosongkan seluruh transaksi untuk mulai dari nol (Katalog produk tetap aman)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>Kosongkan Transaksi</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Main Wrapper -->
+  <main class="app-wrapper mode-frame" id="appWrapper">
+    <div class="mobile-container" id="mobileContainer">
+      
+      <!-- Device Status Bar & Notch -->
+      <div class="status-bar" id="statusBar">
+        <span class="status-time" id="statusClock">09:41</span>
+        <div class="notch-island">
+          <div class="camera-hole"></div>
+        </div>
+        <div class="status-icons">
+          <!-- Cellular signal -->
+          <svg width="15" height="11" viewBox="0 0 18 12" fill="currentColor">
+            <rect x="0" y="8" width="3" height="4" rx="1"></rect>
+            <rect x="5" y="6" width="3" height="6" rx="1"></rect>
+            <rect x="10" y="3" width="3" height="9" rx="1"></rect>
+            <rect x="15" y="0" width="3" height="12" rx="1"></rect>
+          </svg>
+          <!-- Wifi -->
+          <svg width="14" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 18c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4.9-4.9l1.4 1.4C9.6 13.4 10.7 13 12 13s2.4.4 3.5 1.5l1.4-1.4C15.4 11.6 13.8 11 12 11s-3.4.6-4.9 2.1zm-4.2-4.2l1.4 1.4C6.5 8.1 9.1 7 12 7s5.5 1.1 7.7 3.3l1.4-1.4C18.6 6.4 15.5 5 12 5S5.4 6.4 2.9 8.9z"/>
+          </svg>
+          <!-- Battery Pill -->
+          <span class="battery-pill">
+            <svg width="14" height="8" viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="1" width="18" height="10" rx="2"></rect>
+              <rect x="3" y="3" width="12" height="6" fill="#10b981"></rect>
+              <path d="M20 4v4" stroke-linecap="round"></path>
+            </svg>
+            <span>82</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Header Section: Greeting & Summary Cards -->
+      <section class="app-header">
+        <div class="header-top-row">
+          <div>
+            <h1 class="greeting-title">Hi, Banyumili Co <span class="wave-hand">👋</span></h1>
+            <p class="greeting-subtitle">Semangat terus, bisnisnya makin maju!</p>
+          </div>
+          <button class="header-profile-btn" id="profileBtn" title="Profil Toko Shopee">
+            <div class="profile-avatar-inner">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+            <span class="profile-status-dot"></span>
+          </button>
+        </div>
+
+        <!-- Two Primary Summary Cards: Total Revenue & Net Profit -->
+        <div class="summary-cards-grid">
+          <!-- Card 1: Total Revenue -->
+          <div class="summary-card card-revenue" id="cardRevenueSummary">
+            <div class="card-header-row">
+              <div class="card-icon-pill">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zM16.2 13H19v6h-2.8z"/>
+                </svg>
+              </div>
+              <span class="card-title">
+                Total Revenue
+                <span class="chevron-card">›</span>
+              </span>
+            </div>
+            <div class="card-amount" id="totalRevenueDisplay">Rp 5.760.000</div>
+            <div class="card-trend-row">
+              <span class="trend-badge">
+                <span class="trend-arrow">▲</span>
+                <span>+12% vs. kemarin</span>
+              </span>
+              <svg class="card-sparkline" viewBox="0 0 60 24" fill="none">
+                <path d="M2 18 C 15 16, 25 22, 38 12 C 45 6, 52 14, 58 4" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 2: Net Profit -->
+          <div class="summary-card card-profit" id="cardProfitSummary">
+            <div class="card-header-row">
+              <div class="card-icon-pill">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+                  <path d="M16 12h.01"></path>
+                  <path d="M2 10h20"></path>
+                </svg>
+              </div>
+              <span class="card-title">
+                Net Profit
+                <span class="chevron-card">›</span>
+              </span>
+            </div>
+            <div class="card-amount" id="netProfitDisplay">Rp 1.982.000</div>
+            <div class="card-trend-row">
+              <span class="trend-badge">
+                <span class="trend-arrow">▲</span>
+                <span>+18% vs. kemarin</span>
+              </span>
+              <svg class="card-sparkline" viewBox="0 0 60 24" fill="none">
+                <path d="M2 20 C 12 18, 22 22, 32 14 C 42 6, 48 10, 58 2" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Sheet Section (White / Soft Light Gray Area) -->
+      <section class="app-sheet">
+        
+        <!-- Tab 1: Beranda / Home -->
+        <div class="tab-content active" id="tab-beranda">
+          <!-- Secondary Statistics Row: 4 key metrics -->
+          <div class="secondary-stats-card">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </div>
+              <span class="stat-value" id="statTotalTransactions">24</span>
+              <span class="stat-label">Total Transaksi</span>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55l8.95-5.16a1.78 1.78 0 0 0 0-3.16z"></path>
+                </svg>
+              </div>
+              <span class="stat-value" id="statItemsSold">16</span>
+              <span class="stat-label">Produk Terjual</span>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </div>
+              <span class="stat-value" id="statUniqueProducts">8</span>
+              <span class="stat-label">Produk Unik</span>
+            </div>
+
+            <div class="stat-item stat-avg">
+              <div class="stat-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+              </div>
+              <span class="stat-value" id="statAvgTransaction">Rp 3.778.000</span>
+              <span class="stat-label">Rata-rata Transaksi</span>
+            </div>
+          </div>
+
+          <!-- Search & Filter Options -->
+          <div class="search-filter-section">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="searchInput" placeholder="Cari aksesoris mobil / variasi...">
+            </div>
+            
+            <div class="filter-chips">
+              <button class="chip-btn active" data-filter="all">Semua</button>
+              <button class="chip-btn" data-filter="platform-shopee">🟠 Shopee</button>
+              <button class="chip-btn" data-filter="platform-tiktok">🎵 TikTok</button>
+              <button class="chip-btn" data-filter="Selesai">Completed</button>
+              <button class="chip-btn" data-filter="Dikirim">Dikirim</button>
+              <button class="chip-btn" data-filter="Diproses">Diproses</button>
+              <button class="chip-btn" data-filter="Retur">Retur</button>
+            </div>
+          </div>
+
+          <!-- Section Header: Transaksi Terbaru -->
+          <div class="section-header-row">
+            <h2 class="section-title">Transaksi Terbaru</h2>
+            <a class="section-action-link" id="viewAllTrxBtn">
+              Lihat Semua
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </a>
+          </div>
+
+          <!-- Transactions List Container -->
+          <div class="transactions-list" id="transactionsList">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Transaksi (Full Ledger View) -->
+        <div class="tab-content" id="tab-transaksi">
+          <div class="section-header-row">
+            <h2 class="section-title">Semua Transaksi Rekapan</h2>
+            <span class="trx-qty-pill" id="totalTrxCountPill">24 Data</span>
+          </div>
+
+          <div class="search-filter-section">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="ledgerSearchInput" placeholder="Filter no. pesanan, nama produk...">
+            </div>
+
+            <div class="filter-chips" id="ledgerFilterChips">
+              <button class="chip-btn active" data-filter="all">Semua</button>
+              <button class="chip-btn" data-filter="platform-shopee">🟠 Shopee</button>
+              <button class="chip-btn" data-filter="platform-tiktok">🎵 TikTok</button>
+              <button class="chip-btn" data-filter="Selesai">Completed</button>
+              <button class="chip-btn" data-filter="Dikirim">Dikirim</button>
+              <button class="chip-btn" data-filter="Diproses">Diproses</button>
+              <button class="chip-btn" data-filter="Retur">Retur</button>
+            </div>
+          </div>
+
+          <div class="transactions-list" id="ledgerTransactionsList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Produk (Car Accessories Catalog) -->
+        <div class="tab-content" id="tab-produk">
+          <div class="section-header-row">
+            <div>
+              <h2 class="section-title">Katalog Variasi Mobil Banyumili</h2>
+              <span class="trx-qty-pill" id="catalogCountPill" style="margin-top: 2px;">8 Item Terdaftar</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="preset-chip-btn" id="btnResetCatalog" title="Kembalikan ke 8 produk bawaan" style="padding: 7px 10px; font-size: 11px;">
+                🔄 Reset
+              </button>
+              <button class="preset-chip-btn" id="btnOpenAddProductModal" style="background: var(--navy-900); color: #ffffff; border-color: var(--navy-900); padding: 7px 12px; font-weight: 700;">
+                + Tambah Produk
+              </button>
+            </div>
+          </div>
+          <div class="catalog-grid" id="catalogGrid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Lainnya (Reports, Fee Calculator & Settings) -->
+        <div class="tab-content" id="tab-lainnya">
+          <div class="section-header-row">
+            <h2 class="section-title">Pengaturan & Laporan Toko</h2>
+          </div>
+          
+          <div class="detail-header-card">
+            <div class="detail-info" style="width: 100%;">
+              <h3>Banyumili Co - Variasi Mobil</h3>
+              <p>Akun Penjual Shopee Star+ | Toko Aktif</p>
+              <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                <button class="preset-chip-btn" id="btnExportFullCsv">📥 Unduh CSV</button>
+                <button class="preset-chip-btn" id="btnClearAllTrx" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="Hapus semua riwayat transaksi menjadi 0 data bersih (Katalog produk tetap utuh)">🗑️ Kosongkan Transaksi (0 Data)</button>
+                <button class="preset-chip-btn" id="btnResetDemoData" title="Muat ulang 24 transaksi contoh demo (Katalog produk tetap aman)">🔄 Muat 24 Data Demo</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #ffffff; border-radius: 16px; padding: 16px; border: 1px solid var(--border-subtle); margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <span>📊 Integrasi Google Spreadsheet (Gratis & Unlimited)</span>
+              </h3>
+              <span id="gsheetsStatusBadge" class="status-badge" style="background: #f1f5f9; color: #64748b; font-size: 10px;">Lokal (Offline)</span>
+            </div>
+            
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">
+              Setiap transaksi baru otomatis dicatat ke Google Sheets Anda secara real-time. Bisa dibuka langsung dari aplikasi Google Sheets di HP tanpa batasan limit.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label" style="font-size: 11px;">URL Webhook Google Apps Script</label>
+              <input type="url" id="inputGsheetsUrl" class="form-input" style="font-size: 12px; padding: 8px 12px;" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+              <button class="btn-primary" id="btnSaveGsheetsConfig" style="font-size: 12px; padding: 8px 14px; flex: 1;">
+                💾 Sambungkan
+              </button>
+              <button class="btn-secondary" id="btnUploadToGsheets" style="font-size: 12px; padding: 8px 14px; flex: 1;">
+                🚀 Upload Semua ke Sheets
+              </button>
+              <button class="btn-secondary" id="btnSyncFromGsheets" style="font-size: 12px; padding: 8px 14px; flex: 1;">
+                📥 Tarik Data Sheets
+              </button>
+            </div>
+
+            <button type="button" id="btnOpenGsGuide" class="preset-chip-btn" style="width: 100%; margin-top: 10px; justify-content: center; font-size: 11.5px; background: #ecfdf5; border-color: var(--emerald-300); color: var(--emerald-600); font-weight: 700;">
+              📖 Panduan 2 Menit Pasang Google Apps Script
+            </button>
+          </div>
+
+          <div style="background: #ffffff; border-radius: 16px; padding: 16px; border: 1px solid var(--border-subtle); margin-top: 14px;">
+            <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">⚡ Kalkulator Perbandingan Fee Marketplace</h3>
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Simulasi perbandingan biaya admin antara <strong>Shopee Star+ (~6.5%)</strong> vs <strong>TikTok Shop (~5.5%)</strong>.</p>
+            <div class="form-group">
+              <label class="form-label">Simulasi Harga Jual Produk (Rp)</label>
+              <input type="number" id="simHargaJual" class="form-input" value="100000">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+              <div style="background: #fff7ed; border-radius: 10px; padding: 10px; border: 1px solid #ffedd5;">
+                <div style="font-weight: 700; font-size: 12px; color: #ea580c; margin-bottom: 4px;">🟠 Shopee (6.5%)</div>
+                <div style="font-size: 11px; color: #64748b;">Fee: <strong id="simBiayaAdminShopee" style="color: #ea580c;">Rp 6.500</strong></div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Terima: <strong id="simDanaShopee" style="color: #15803d;">Rp 93.500</strong></div>
+              </div>
+              <div style="background: #f8fafc; border-radius: 10px; padding: 10px; border: 1px solid #e2e8f0;">
+                <div style="font-weight: 700; font-size: 12px; color: #0f172a; margin-bottom: 4px;">🎵 TikTok Shop (5.5%)</div>
+                <div style="font-size: 11px; color: #64748b;">Fee: <strong id="simBiayaAdminTiktok" style="color: #0f172a;">Rp 5.500</strong></div>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Terima: <strong id="simDanaTiktok" style="color: #15803d;">Rp 94.500</strong></div>
+              </div>
+            </div>
+            <span id="simBiayaAdmin" style="display: none;">Rp 6.500</span>
+            <span id="simDanaDiterima" style="display: none;">Rp 93.500</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Floating Action Button (FAB): + Add Transaction -->
+      <button class="fab-add-btn" id="fabAddBtn">
+        <span class="fab-plus-icon">+</span>
+        <span>Add Transaction</span>
+      </button>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav">
+        <div class="nav-item active" data-tab="beranda">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+          </div>
+          <span class="nav-label">Beranda</span>
+        </div>
+
+        <div class="nav-item" data-tab="transaksi">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <span class="nav-label">Transaksi</span>
+        </div>
+
+        <div class="nav-item" data-tab="produk">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <span class="nav-label">Produk</span>
+        </div>
+
+        <div class="nav-item" data-tab="lainnya">
+          <div class="nav-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="19" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <span class="nav-label">Lainnya</span>
+        </div>
+      </nav>
+
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       MODAL: ADD TRANSACTION (With Real-Time Live Calculation Preview)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="addTransactionModal">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-handle"></div>
+      
+      <div class="modal-header-row">
+        <h3 class="modal-title">+ Tambah Transaksi Penjualan</h3>
+        <button class="modal-close-btn" id="closeAddModalBtn">&times;</button>
+      </div>
+
+      <!-- Quick Catalog Selector Chips -->
+      <div class="catalog-presets-wrap">
+        <div class="presets-label">Pilih Cepat Produk Reseller:</div>
+        <div class="presets-chips" id="quickCatalogChips">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <form id="addTransactionForm">
+        <!-- Platform E-Commerce Selector -->
+        <div class="form-group">
+          <label class="form-label">Platform Penjualan <span class="req">*</span></label>
+          <div class="platform-segmented-control" id="platformSelector">
+            <button type="button" class="platform-segment-btn active shopee" data-platform="Shopee">
+              <span class="platform-btn-icon">🟠</span>
+              <span>Shopee</span>
+            </button>
+            <button type="button" class="platform-segment-btn tiktok" data-platform="TikTok">
+              <span class="platform-btn-icon">🎵</span>
+              <span>TikTok Shop</span>
+            </button>
+          </div>
+          <input type="hidden" id="formPlatform" value="Shopee">
+        </div>
+
+        <!-- Tanggal Pesanan -->
+        <div class="form-group">
+          <label class="form-label" for="formTanggal">Tanggal Pesanan <span class="req">*</span></label>
+          <input type="date" id="formTanggal" class="form-input" required>
+        </div>
+
+        <!-- Nama Produk -->
+        <div class="form-group">
+          <label class="form-label" for="formNamaProduk">Nama Produk Variasi Mobil <span class="req">*</span></label>
+          <input type="text" id="formNamaProduk" class="form-input" placeholder="Contoh: Sarung Stir Mobil Hitam" required>
+        </div>
+
+        <!-- Variasi Produk -->
+        <div class="form-group">
+          <label class="form-label" for="formVariasi">Variasi Produk</label>
+          <input type="text" id="formVariasi" class="form-input" placeholder="Contoh: Hitam Carbon - Universal">
+        </div>
+
+        <!-- Qty & Status in 2 cols -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Jumlah (Qty) <span class="req">*</span></label>
+            <div class="qty-counter-group">
+              <button type="button" class="qty-step-btn" id="btnQtyMinus">-</button>
+              <input type="number" id="formQty" class="form-input qty-input" value="1" min="1" required>
+              <button type="button" class="qty-step-btn" id="btnQtyPlus">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="formStatus">Status Pesanan</label>
+            <select id="formStatus" class="form-select">
+              <option value="Selesai" selected>Selesai (Completed)</option>
+              <option value="Dikirim">Dikirim (In Transit)</option>
+              <option value="Diproses">Diproses (Packing)</option>
+              <option value="Retur">Retur (Returned)</option>
+              <option value="Batal">Dibatalkan</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Harga Modal Satuan & Harga Jual Satuan in 2 cols -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="formHargaModal">Harga Modal Satuan (Rp) <span class="req">*</span></label>
+            <input type="number" id="formHargaModal" class="form-input" placeholder="45000" min="0" step="500" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="formHargaJual">Harga Jual Satuan (Rp) <span class="req">*</span></label>
+            <input type="number" id="formHargaJual" class="form-input" placeholder="90000" min="0" step="500" required>
+          </div>
+        </div>
+
+        <!-- Biaya Admin Marketplace -->
+        <div class="form-group">
+          <label class="form-label" for="formBiayaAdmin">Biaya Admin (<span id="formAdminPlatformLabel">Shopee Star+</span>)</label>
+          <input type="number" id="formBiayaAdmin" class="form-input" placeholder="6000" min="0" step="100">
+          <div class="fee-helper-row">
+            <span style="font-size: 11px; color: #64748b;" id="formFeeHelperNote">Fee marketplace Shopee ~6.5%</span>
+            <button type="button" class="fee-helper-btn" id="btnAutoCalcAdminFee">⚡ Auto Hitung (<span id="feePercentLabel">6.5%</span>)</button>
+          </div>
+        </div>
+
+        <!-- Catatan / Resi -->
+        <div class="form-group">
+          <label class="form-label" for="formCatatan">Catatan / No. Resi</label>
+          <input type="text" id="formCatatan" class="form-input" placeholder="Opsional: No. Pesanan atau kurir">
+        </div>
+
+        <!-- =========================================================
+             LIVE CALCULATION PREVIEW BOX (Mandatory Feature)
+             ========================================================= -->
+        <div class="live-preview-box">
+          <div class="preview-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Kalkulasi Otomatis Transaksi</span>
+          </div>
+
+          <div class="preview-breakdown">
+            <div class="preview-row">
+              <span>Total Penjualan (<span id="calcPreviewQtyText">1</span> × <span id="calcPreviewJualText">Rp 0</span>):</span>
+              <strong id="calcPreviewTotalPenjualan">Rp 0</strong>
+            </div>
+            <div class="preview-row">
+              <span>Total Modal (<span id="calcPreviewQtyText2">1</span> × <span id="calcPreviewModalText">Rp 0</span>):</span>
+              <span id="calcPreviewTotalModal">- Rp 0</span>
+            </div>
+            <div class="preview-row">
+              <span>Biaya Admin (<span id="calcPreviewPlatformLabel">Shopee</span>):</span>
+              <span id="calcPreviewBiayaAdmin">- Rp 0</span>
+            </div>
+          </div>
+
+          <div class="preview-profit-row">
+            <div>
+              <div class="preview-profit-label">
+                PROFIT BERSIH
+                <span class="preview-margin-pill" id="calcPreviewMargin">Margin 0%</span>
+              </div>
+              <div class="preview-profit-sub">Total Penjualan - Total Modal - Admin</div>
+            </div>
+            <div class="preview-profit-amount" id="calcPreviewProfitBersih">Rp 0</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btnCancelAdd">Batal</button>
+          <button type="submit" class="btn-primary" id="btnSaveTransaction">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Simpan Transaksi</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: TRANSACTION DETAILS & ACTIONS
+       ========================================================================== -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-handle"></div>
+      
+      <div class="modal-header-row">
+        <h3 class="modal-title">Rincian Transaksi</h3>
+        <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
+      </div>
+
+      <div class="detail-header-card">
+        <img src="/products/over_fender.jpg" id="detailImage" class="detail-img" alt="Produk">
+        <div class="detail-info" style="width: 100%;">
+          <h3 id="detailTitle">Sarung Stir Mobil</h3>
+          <p id="detailVariation">Hitam - Universal</p>
+          <div class="detail-status-editor-row">
+            <span class="status-badge" id="detailStatusBadge">Completed</span>
+            <div class="status-select-wrapper">
+              <select id="detailStatusSelect" class="detail-status-select" title="Ganti status pesanan">
+                <option value="Selesai">Ubah: 🟢 Completed (Selesai)</option>
+                <option value="Dikirim">Ubah: 🚚 Dikirim (In Transit)</option>
+                <option value="Diproses">Ubah: 📦 Diproses (Packing)</option>
+                <option value="Retur">Ubah: ↩️ Retur (Returned)</option>
+                <option value="Batal">Ubah: ❌ Dibatalkan</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="detail-table">
+        <tbody>
+          <tr>
+            <td>ID Transaksi</td>
+            <td id="detailId">TRX-1024</td>
+          </tr>
+          <tr>
+            <td>Platform Penjualan</td>
+            <td id="detailPlatform"><span class="trx-platform-tag shopee">🟠 Shopee</span></td>
+          </tr>
+          <tr>
+            <td>Tanggal Pesanan</td>
+            <td id="detailDate">21 Okt 2026</td>
+          </tr>
+          <tr>
+            <td>Jumlah Item (Qty)</td>
+            <td id="detailQty">2 pcs</td>
+          </tr>
+          <tr>
+            <td>Harga Modal Satuan</td>
+            <td id="detailHargaModal">Rp 45.000</td>
+          </tr>
+          <tr>
+            <td>Harga Jual Satuan</td>
+            <td id="detailHargaJual">Rp 90.000</td>
+          </tr>
+          <tr>
+            <td>Total Omset Penjualan</td>
+            <td id="detailTotalPenjualan">Rp 180.000</td>
+          </tr>
+          <tr>
+            <td>Total Modal Supplier</td>
+            <td id="detailTotalModal">Rp 90.000</td>
+          </tr>
+          <tr>
+            <td>Biaya Admin Marketplace</td>
+            <td id="detailBiayaAdmin">Rp 6.000</td>
+          </tr>
+          <tr class="highlight">
+            <td>Profit Bersih Diterima</td>
+            <td id="detailProfitBersih">Rp 84.000</td>
+          </tr>
+          <tr>
+            <td>Catatan</td>
+            <td id="detailCatatan" style="font-weight: 500; font-size: 12px; color: #64748b;">-</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="btnDeleteTrx" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;">Hapus Transaksi</button>
+        <button type="button" class="btn-primary" id="btnCloseDetail">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile & Store Summary Modal -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header-row">
+        <h3 class="modal-title">Toko Banyumili Co</h3>
+        <button class="modal-close-btn" id="closeProfileModalBtn">&times;</button>
+      </div>
+      <div class="detail-header-card">
+        <div class="profile-avatar-inner" style="width: 54px; height: 54px; font-size: 24px;">🏢</div>
+        <div class="detail-info">
+          <h3>Banyumili Co Official</h3>
+          <p>Kategori: Aksesoris & Variasi Mobil</p>
+          <span class="status-badge selesai">⭐ Star+ Seller Shopee</span>
+        </div>
+      </div>
+      <div style="background: #f8fafc; border-radius: 12px; padding: 14px; font-size: 13px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #64748b;">Rating Toko:</span>
+          <strong>⭐ 4.9 / 5.0 (1.400+ Ulasan)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #64748b;">Tingkat Balasan Chat:</span>
+          <strong>98% (Hitungan Menit)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #64748b;">Wilayah Pengiriman:</span>
+          <strong>Solo / Boyolali, Jawa Tengah</strong>
+        </div>
+      </div>
+      <button type="button" class="btn-primary" id="btnCloseProfile" style="width: 100%;">Tutup</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: TAMBAH / EDIT PRODUK KATALOG
+       ========================================================================== -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-handle"></div>
+      
+      <div class="modal-header-row">
+        <h3 class="modal-title" id="productModalTitle">✏️ Edit Produk</h3>
+        <button class="modal-close-btn" id="closeProductModalBtn">&times;</button>
+      </div>
+
+      <form id="productForm">
+        <input type="hidden" id="formProdId">
+
+        <!-- Nama Produk -->
+        <div class="form-group">
+          <label class="form-label" for="formProdNama">Nama Produk Variasi *</label>
+          <input type="text" id="formProdNama" class="form-input" required placeholder="Contoh: Over Fender Triton 2015–2019">
+        </div>
+
+        <!-- Kategori & Variasi Standar -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="formProdKategori">Kategori</label>
+            <select id="formProdKategori" class="form-select">
+              <option value="Over Fender">Over Fender</option>
+              <option value="Eyelid">Eyelid</option>
+              <option value="Airscoop">Airscoop</option>
+              <option value="Cover Mesin">Cover Mesin</option>
+              <option value="Variasi Mobil">Variasi Mobil</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="formProdVariasi">Variasi Default</label>
+            <input type="text" id="formProdVariasi" class="form-input" placeholder="Contoh: Baut L Hitam Doff">
+          </div>
+        </div>
+
+        <!-- Harga Modal (HPP) -->
+        <div class="form-group">
+          <label class="form-label" for="formProdModal">Harga Modal Supplier / HPP (Rp) *</label>
+          <input type="number" id="formProdModal" class="form-input" min="0" step="1000" required placeholder="0">
+        </div>
+
+        <!-- Section 1: Shopee Pricing -->
+        <div class="platform-pricing-box shopee-box">
+          <div class="platform-pricing-header">
+            <span class="platform-pricing-title">🟠 Harga Jual & Biaya Shopee</span>
+            <span class="platform-fee-tag">Fee ~6.5%</span>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="formProdJualShopee">Harga Jual Shopee (Rp) *</label>
+              <input type="number" id="formProdJualShopee" class="form-input" min="0" step="1000" required placeholder="0">
+            </div>
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label" for="formProdAdminShopee" style="margin-bottom: 0;">Fee Admin (Rp)</label>
+                <button type="button" class="fee-helper-btn" id="btnAutoCalcProdAdminShopee">⚡ 6.5%</button>
+              </div>
+              <input type="number" id="formProdAdminShopee" class="form-input" min="0" step="500" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: TikTok Shop Pricing -->
+        <div class="platform-pricing-box tiktok-box">
+          <div class="platform-pricing-header">
+            <span class="platform-pricing-title">🎵 Harga Jual & Biaya TikTok Shop</span>
+            <span class="platform-fee-tag">Fee ~5.5%</span>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="formProdJualTiktok">Harga Jual TikTok (Rp) *</label>
+              <input type="number" id="formProdJualTiktok" class="form-input" min="0" step="1000" required placeholder="0">
+            </div>
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label" for="formProdAdminTiktok" style="margin-bottom: 0;">Fee Admin (Rp)</label>
+                <button type="button" class="fee-helper-btn" id="btnAutoCalcProdAdminTiktok">⚡ 5.5%</button>
+              </div>
+              <input type="number" id="formProdAdminTiktok" class="form-input" min="0" step="500" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden inputs for backward compatibility if any -->
+        <input type="hidden" id="formProdJual">
+        <input type="hidden" id="formProdAdmin">
+
+        <!-- Pilihan Foto Produk -->
+        <div class="form-group">
+          <label class="form-label">Pilih Foto Produk</label>
+          <div class="img-picker-grid" id="productImagePicker">
+            <div class="img-picker-item selected" data-img="/products/over_fender.jpg" title="Over Fender">
+              <img src="/products/over_fender.jpg" alt="Over Fender">
+            </div>
+            <div class="img-picker-item" data-img="/products/eyelid_lampu.jpg" title="Eyelid Lampu">
+              <img src="/products/eyelid_lampu.jpg" alt="Eyelid Calya">
+            </div>
+            <div class="img-picker-item" data-img="/products/eyelid_agya.jpg" title="Eyelid Agya/Ayla">
+              <img src="/products/eyelid_agya.jpg" alt="Eyelid Agya">
+            </div>
+            <div class="img-picker-item" data-img="/products/airscoop.jpg" title="Airscoop">
+              <img src="/products/airscoop.jpg" alt="Airscoop">
+            </div>
+            <div class="img-picker-item" data-img="/products/cover_mesin.jpg" title="Cover Mesin">
+              <img src="/products/cover_mesin.jpg" alt="Cover Mesin">
+            </div>
+          </div>
+          <input type="hidden" id="formProdGambar" value="/products/over_fender.jpg">
+          <input type="text" id="formProdGambarCustom" class="form-input" style="margin-top: 6px; font-size: 12px;" placeholder="Atau tempel URL gambar kustom di sini...">
+        </div>
+
+        <!-- Dual Margin Comparison Preview -->
+        <div class="prod-margin-box">
+          <div class="margin-preview-row">
+            <span style="color: #64748b; font-size: 12px;">🟠 Margin Shopee:</span>
+            <strong id="prodMarginShopeePreview" style="color: #ea580c; font-size: 13px;">~Rp 0 (0%)</strong>
+          </div>
+          <div class="margin-preview-row" style="margin-top: 6px;">
+            <span style="color: #64748b; font-size: 12px;">🎵 Margin TikTok:</span>
+            <strong id="prodMarginTiktokPreview" style="color: var(--emerald-500); font-size: 13px;">~Rp 0 (0%)</strong>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="btnDeleteProduct" style="display: none; color: #ef4444; border-color: #fecaca; background: #fef2f2;">Hapus</button>
+          <button type="button" class="btn-secondary" id="btnCancelProductModal">Batal</button>
+          <button type="submit" class="btn-primary" id="btnSaveProduct">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span id="btnSaveProductText">Simpan Produk</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Google Sheets Setup Guide Modal -->
+  <div class="modal-backdrop" id="gsGuideModal">
+    <div class="modal-content-sheet" style="max-width: 500px;">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-header-row">
+        <h3 class="modal-title">📖 Panduan Sambung Google Sheets</h3>
+        <button class="modal-close-btn" id="closeGsGuideModalBtn">&times;</button>
+      </div>
+      
+      <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+        <p style="margin-bottom: 12px;">Ikuti 4 langkah cepat ini untuk membuat spreadsheet online gratis Anda:</p>
+        
+        <ol style="padding-left: 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <li>Buka Google Sheets baru di <a href="https://sheets.new" target="_blank" style="color: var(--emerald-500); font-weight: 700;">sheets.new</a></li>
+          <li>Klik menu <strong>Ekstensi (Extensions)</strong> ➔ <strong>Apps Script</strong>.</li>
+          <li>Hapus isi bawaannya, lalu salin dan tempel kode dari file <code>google_apps_script.js</code> di project Anda.</li>
+          <li>Klik tombol biru <strong>Terapkan (Deploy)</strong> ➔ <strong>Penerapan baru (New deployment)</strong>:
+            <ul style="padding-left: 16px; margin-top: 4px; font-size: 12px; color: #64748b;">
+              <li>Pilih jenis: <strong>Aplikasi Web (Web app)</strong></li>
+              <li>Akses (Who has access): Pilih <strong>Siapa saja (Anyone)</strong></li>
+            </ul>
+          </li>
+          <li>Salin <strong>URL Aplikasi Web</strong> yang dihasilkan (berakhiran <code>/exec</code>), lalu tempelkan di kotak URL di atas dan klik <strong>💾 Sambungkan</strong>!</li>
+        </ol>
+
+        <div style="background: #f8fafc; border-radius: 12px; padding: 12px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-size: 12px;">Kode Apps Script (google_apps_script.js):</strong>
+            <button type="button" id="btnCopyGsCode" class="preset-chip-btn" style="font-size: 10px; padding: 3px 8px;">📋 Salin Kode</button>
+          </div>
+          <p style="font-size: 11px; color: #64748b;">File telah siap di folder project Anda di <code>google_apps_script.js</code>.</p>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary" id="btnCloseGsGuide" style="width: 100%;">Tutup Panduan</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: QUICK STATUS CHANGER ACTION SHEET
+       ========================================================================== -->
+  <div class="modal-backdrop" id="quickStatusModal">
+    <div class="modal-content-sheet" style="max-width: 390px;">
+      <div class="modal-drag-handle"></div>
+      
+      <div class="modal-header-row">
+        <div>
+          <h3 class="modal-title">Ubah Status Pesanan</h3>
+          <p id="quickStatusSubtitle" style="font-size: 12px; color: #64748b; margin-top: 2px;">Pilih status baru</p>
+        </div>
+        <button class="modal-close-btn" id="closeQuickStatusBtn">&times;</button>
+      </div>
+
+      <div class="quick-status-list" id="quickStatusList">
+        <button type="button" class="quick-status-option" data-status="Selesai">
+          <span class="status-badge selesai">Completed</span>
+          <div class="quick-status-info">
+            <strong>Selesai (Completed)</strong>
+            <span>Pesanan telah diterima pembeli & dana cair</span>
+          </div>
+          <span class="quick-status-check">✓</span>
+        </button>
+
+        <button type="button" class="quick-status-option" data-status="Dikirim">
+          <span class="status-badge dikirim">Dikirim</span>
+          <div class="quick-status-info">
+            <strong>Dalam Pengiriman</strong>
+            <span>Paket sudah diserahkan ke ekspedisi Shopee</span>
+          </div>
+          <span class="quick-status-check">✓</span>
+        </button>
+
+        <button type="button" class="quick-status-option" data-status="Diproses">
+          <span class="status-badge diproses">Diproses</span>
+          <div class="quick-status-info">
+            <strong>Sedang Diproses</strong>
+            <span>Pesanan sedang disiapkan / dipacking</span>
+          </div>
+          <span class="quick-status-check">✓</span>
+        </button>
+
+        <button type="button" class="quick-status-option" data-status="Retur">
+          <span class="status-badge retur">Retur</span>
+          <div class="quick-status-info">
+            <strong>Pengembalian (Retur)</strong>
+            <span>Paket dikembalikan oleh pembeli / gagal kirim</span>
+          </div>
+          <span class="quick-status-check">✓</span>
+        </button>
+
+        <button type="button" class="quick-status-option" data-status="Batal">
+          <span class="status-badge batal">Batal</span>
+          <div class="quick-status-info">
+            <strong>Dibatalkan</strong>
+            <span>Pesanan dibatalkan pembeli atau sistem</span>
+          </div>
+          <span class="quick-status-check">✓</span>
+        </button>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 14px;">
+        <button type="button" class="btn-secondary" id="btnCancelQuickStatus" style="width: 100%;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="/src/js/app.js"></script>
+</body>
+</html>
